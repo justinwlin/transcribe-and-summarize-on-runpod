@@ -170,7 +170,7 @@ def cleanup_downloaded_files(file_paths: List[str]) -> None:
                 print(f"Error removing file {file_path}: {str(e)}")
 
 
-def summarize_llm_call(text: str) -> str:
+def summarize_llm_call(text: str, prompt: str = None) -> str:
     """
     Generate a summary of the input text using a local LLM via Ollama.
     
@@ -179,16 +179,20 @@ def summarize_llm_call(text: str) -> str:
     
     Args:
         text: Text to summarize
+        prompt: Optional custom prompt to guide the summarization
         
     Returns:
         str: Summarized text
     """
     try:
+        # If no custom prompt is provided, use the text directly
+        final_prompt = prompt + "\n\n" + text if prompt else text
+        
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
                 "model": "deepseek-r1:1.5b", 
-                "prompt": text,
+                "prompt": final_prompt,
                 "stream": False
             }
         )
@@ -316,7 +320,7 @@ def run(job: Dict[str, Any]) -> Dict[str, Any]:
                     "segments": result.segments,
                     "detected_language": result.detected_language,
                     "full_text": full_text,
-                    "summarized": summarize_llm_call(full_text)
+                    "summarized": summarize_llm_call(full_text, job_input.get('summarization_prompt'))
                 }
                 
                 results.append(output_dict)

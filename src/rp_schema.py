@@ -23,6 +23,11 @@ INPUT_VALIDATIONS = {
         'required': False,
         'default': None
     },
+    'summarization_prompt': {
+        'type': str,
+        'required': False,
+        'default': None
+    },
     'batch_size': {
         'type': int,
         'required': False,
